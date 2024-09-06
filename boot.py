@@ -31,11 +31,14 @@ def WIFI_Connect():
     if not wlan.isconnected():
         print('connecting to network...')
         
+        # print(wlan.scan())
+        
         try:
+            wlan.connect('ovo', '00000000')  # 输入WIFI账号密码
             # wlan.connect('ovo', '00000000')  # 输入WIFI账号密码
-            wlan.connect('DT46', '12345678')  # 输入WIFI账号密码
-        except:
-            print('WIFI Connect Failed!')
+            # wlan.connect('DT46', '12345678')  # 输入WIFI账号密码
+        except Exception as e:
+            print(f'错误 Exception：{e}')
 
         while not wlan.isconnected():
             # LED闪烁提示
@@ -52,7 +55,7 @@ def WIFI_Connect():
 
     if wlan.isconnected():
         # LED点亮
-        LED.value(1)
+        LED.value(0)
 
         # 串口打印信息
         print('network information:', wlan.ifconfig())
