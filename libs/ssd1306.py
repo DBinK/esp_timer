@@ -125,6 +125,33 @@ class SSD1306:
         """
         self.framebuf.text(string, x, y, col)
 
+    def line(self, x0, y0, x1, y1, col=1):
+        """
+        绘制一条直线。
+        x0, y0 (int): 起始点的坐标。
+        x1, y1 (int): 结束点的坐标。
+        col (int): 线的颜色。
+        """
+        self.framebuf.line(x0, y0, x1, y1, col)
+
+    def rect(self, x, y, w, h, col=1):
+        """
+        绘制一个矩形。
+        x, y (int): 矩形左上角的坐标。
+        w, h (int): 矩形的宽度和高度。
+        col (int): 矩形的颜色。
+        """
+        self.framebuf.rect(x, y, w, h, col)
+
+    def fill_rect(self, x, y, w, h, col=1):
+        """
+        填充一个矩形。
+        x, y (int): 矩形左上角的坐标。
+        w, h (int): 矩形的宽度和高度。
+        col (int): 矩形的颜色。
+        """
+        self.framebuf.fill_rect(x, y, w, h, col)
+
     def block(self, x1, y1, x2, y2, fill=False, thickness=1, col=1):
         """
         绘制一个矩形。
@@ -186,6 +213,9 @@ class SSD1306:
                 else:
                     x -= 1
                     p += 2 * y - 2 * x + 1
+
+
+
 
  
 class SSD1306_I2C(SSD1306):
