@@ -9,7 +9,7 @@ from machine import Pin, RTC
 
 # 释放所有GPIO, 断电重上电不再失控
 def release_all_GPIO():
-    for i in range(0, 48):
+    for i in range(0, 10):
         try:
             GND = Pin(i, Pin.OUT, value=0)
             print(f"releasing gpio {i}")
@@ -40,12 +40,12 @@ def WIFI_Connect():
         while not wlan.isconnected():
             # LED闪烁提示
             LED.value(1)
-            time.sleep_ms(300)
+            time.sleep_ms(500)
             LED.value(0)
-            time.sleep_ms(300)
+            time.sleep_ms(500)
 
             # 超时判断, 15秒没连接成功判定为超时
-            if time.time() - start_time > 15:
+            if time.time() - start_time > 8:
                 LED.value(0)
                 print('WIFI Connected Timeout!')
                 break
@@ -56,10 +56,14 @@ def WIFI_Connect():
 
         # 串口打印信息
         print('network information:', wlan.ifconfig())
-
+        
         # 同步时间
-        time.sleep(1)
-        ntptime.settime()
+        try:
+            time.sleep(1)
+            ntptime.host = 'ntp.aliyun.com'
+            ntptime.settime()
+        except OSError as e:
+            print('NTP time sync failed:', e)
         
         # 获取当前UTC时间
         utc_time = time.localtime()

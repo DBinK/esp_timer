@@ -34,7 +34,7 @@ def WIFI_Connect():
             time.sleep_ms(300)
 
             # 超时判断, 15秒没连接成功判定为超时
-            if time.time() - start_time > 15:
+            if time.time() - start_time > 8:
                 print('WIFI Connected Timeout!')
                 break
 
