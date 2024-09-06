@@ -18,12 +18,13 @@ oled.circle(64, 32, 20, fill=False, col=1)
 
 # 定义定时器中断的回调函数
 def timer_irq(timer_pin):
-    
+
     date_time = rtc.datetime()
     
-    time_str = f'time:{date_time[3]}:{date_time[4]}:{date_time[5]:{date_time[6]}}'
-    date_str = f'date:{date_time[0]}:{date_time[1]}:{date_time[2]}'
-
+    time_str = f't:{date_time[4]}:{date_time[5]}:{date_time[6]}'
+    date_str = f'd:{date_time[0]}:{date_time[1]}:{date_time[2]}'
+    
+    oled.fill(0)
     oled.text(time_str, 10, 10)
     oled.text(date_str, 10, 20)
 

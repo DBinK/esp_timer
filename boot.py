@@ -69,12 +69,9 @@ def WIFI_Connect():
         utc_time = time.localtime()
         print("UTC时间:", utc_time)
 
-        # 计算并打印北京时间（UTC+8）
-        beijing_time = time.localtime(time.mktime(utc_time) + 8 * 3600)
-        
-        # 创建 RTC 对象
+        # 计算并更新北京时间（UTC+8） 到 RTC
         rtc = RTC()
-        rtc.datetime(beijing_time)
+        rtc.datetime((utc_time[0], utc_time[1], utc_time[2], utc_time[6], utc_time[3] + 8, utc_time[4], utc_time[5], 0))
         
         print("北京时间:", rtc.datetime())
 
