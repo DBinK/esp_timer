@@ -1,26 +1,60 @@
-import time
-import network
+import network, time, ntptime
+from machine import Pin
 
+# 释放所有GPIO, 断电重上电不再失控
+def release_all_GPIO():
+    for i in range(0, 48):
+        try:
+            GND = Pin(i, Pin.OUT, value=0)
+            print(f"releasing gpio {i}")
+        except:
+            print(f"skip gpio {i}")
+            continue
 
-# 设置路由器 WiFi 账号与密码
-ssid = 'ovo'
-password = '00000000'
+release_all_GPIO()
 
-# 创建 WIFI 连接对象
-wlan = network.WLAN(network.STA_IF)
-# 激活 wlan 接口
-wlan.active(True)
-# 扫描允许访问的 WiFi
-print('扫描周围信号源：', wlan.scan())
+LED = Pin(8, Pin.OUT)  # 构建led对象
+LED.value(1)  # 点亮LED，也可以使用led.on()
 
-print("正在连接 WiFi 中", end="")
-#
-wlan.connect(ssid, password)
+# WIFI连接函数
+def WIFI_Connect():
+    wlan = network.WLAN(network.STA_IF)  # STA模式
+    wlan.active(True)  # 激活接口
+    start_time = time.time()  # 记录时间做超时判断
 
-# 如果一直没有连接成功，则每隔 0.1s 在命令号中打印一个 .
-while not wlan.isconnected():
-  print(".", end="")
-  time.sleep(0.5)
+    if not wlan.isconnected():
+        print('connecting to network...')
+        wlan.connect('ovo', '00000000')  # 输入WIFI账号密码
 
-# 连接成功之后，打印出 IP、子网掩码(netmask)、网关(gw)、DNS 地址
-print(f"\n{wlan.ifconfig()}")
+        while not wlan.isconnected():
+            # LED闪烁提示
+            LED.value(1)
+            time.sleep_ms(300)
+            LED.value(0)
+            time.sleep_ms(300)
+
+            # 超时判断, 15秒没连接成功判定为超时
+            if time.time() - start_time > 15:
+                print('WIFI Connected Timeout!')
+                break
+
+    if wlan.isconnected():
+        # LED点亮
+        LED.value(1)
+
+        # 串口打印信息
+        print('network information:', wlan.ifconfig())
+
+        # 同步时间
+        ntptime.settime()
+        
+        # 获取当前UTC时间
+        utc_time = time.localtime()
+        print("UTC时间:", utc_time)
+
+        # 计算并打印北京时间（UTC+8）
+        beijing_time = time.localtime(time.mktime(utc_time) + 8 * 3600)
+        print("北京时间:", beijing_time)
+
+# 执行WIFI连接函数
+WIFI_Connect()
