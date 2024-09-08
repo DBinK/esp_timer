@@ -34,9 +34,9 @@ def WIFI_Connect():
         # print(wlan.scan())
         
         try:
-            wlan.connect('ovo', '00000000')  # 输入WIFI账号密码
             # wlan.connect('ovo', '00000000')  # 输入WIFI账号密码
-            # wlan.connect('DT46', '12345678')  # 输入WIFI账号密码
+            # wlan.connect('ovo', '00000000')  # 输入WIFI账号密码
+            wlan.connect('DT46', '12345678')  # 输入WIFI账号密码
         except Exception as e:
             print(f'错误 Exception：{e}')
 
@@ -48,14 +48,14 @@ def WIFI_Connect():
             time.sleep_ms(500)
 
             # 超时判断, 15秒没连接成功判定为超时
-            if time.time() - start_time > 8:
-                LED.value(0)
+            if time.time() - start_time > 5:
+                LED.value(1)
                 print('WIFI Connected Timeout!')
                 break
 
     if wlan.isconnected():
-        # LED点亮
-        LED.value(0)
+        
+        LED.value(0) # LED点亮
 
         # 串口打印信息
         print('network information:', wlan.ifconfig())
