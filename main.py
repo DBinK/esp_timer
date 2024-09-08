@@ -9,20 +9,26 @@ i2c = SoftI2C(scl=Pin(1), sda=Pin(0))
 oled = SSD1306_I2C(width=128, height=64, i2c=i2c)
 KEY = Pin(9, Pin.IN, Pin.PULL_UP)  # 构建KEY对象
 
-cntdown_on = 0  # 按下按键的计数器
-
+cntdown_on = 0        # 倒计时启动标志
+keypass_cnt = 0
 cntdown_interval = 5  # 倒计时的间隔时间单位 s
 
 def init_time(KEY_callback):
-    global cntdown_on, start_time
-    time.sleep_ms(10)  # 消除抖动
+    global cntdown_on, start_time, keypass_cnt
+    time.sleep_ms(100)  # 消除抖动
     if KEY.value() == 0:  # 确认按键被按下
-        cntdown_on = True
-        start_time  = time.time()
+
+        keypass_cnt += 1 
+
+        if cntdown_on:
+            start_time  = time.time() + (cntdown_interval * keypass_cnt)
+        else:
+            cntdown_on = True
+            start_time  = time.time()
 
 # 定义定时器中断的回调函数
 def main(timer_callback):
-    global cntdown_on, start_time, cntdown_interval
+    global cntdown_on, start_time, cntdown_interval, keypass_cnt
     
     oled.fill(0)  # 清屏
     
@@ -47,7 +53,8 @@ def main(timer_callback):
         oled.text(f'cnt {cntdown_interval - pass_time} s', 10, 45)
 
         if pass_time >= cntdown_interval:
-            cntdown_on = False
+            cntdown_on  = False
+            keypass_cnt = 0 
     
         print(f"倒计时 {pass_time} s")
     
