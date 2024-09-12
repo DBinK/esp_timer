@@ -7,6 +7,7 @@ class CountdownTimer:
         self.rtc = RTC()
         self.i2c = SoftI2C(scl=Pin(scl_pin), sda=Pin(sda_pin))
         self.oled = SSD1306_I2C(width=128, height=64, i2c=self.i2c)
+        self.led = Pin(8, Pin.OUT)
         
 
         self.cntdown_on = False
@@ -57,14 +58,20 @@ class CountdownTimer:
             if self.cntdown_time <= 0:
                 self.oled.fill(0)
                 self.oled.show()
+                self.led.value(0)
+
                 time.sleep(0.3)
+                
                 self.oled.fill(1)
                 self.oled.text(f'cnt {self.cntdown_time} s', 10, 45, 0)
                 self.oled.show()
+                self.led.value(1)
                 
             if self.cntdown_time <= -15:
                 self.cntdown_on = False
-                self.keypass_cnt = 0 
+                self.keypass_cnt = 0
+                
+                self.led.value(0)
 
             print(f"倒计时 {self.cntdown_time:.1f} s")
         
