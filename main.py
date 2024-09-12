@@ -56,4 +56,4 @@ class CountdownTimer:
         self.oled.show()
 
 # 使用示例
-countdown_timer = CountdownTimer(scl_pin=1, sda_pin=0, key_pin=9, countdown_interval=5)
+countdown_timer = CountdownTimer(scl_pin=4, sda_pin=3, key_pin=9, countdown_interval=5)
