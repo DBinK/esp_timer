@@ -35,8 +35,8 @@ def WIFI_Connect():
         
         try:
             # wlan.connect('ovo', '00000000')  # 输入WIFI账号密码
-            # wlan.connect('ovo', '00000000')  # 输入WIFI账号密码
-            wlan.connect('DT46', '12345678')  # 输入WIFI账号密码
+            wlan.connect('ovo', '00000000')  # 输入WIFI账号密码
+            # wlan.connect('DT46', '12345678')  # 输入WIFI账号密码
         except Exception as e:
             print(f'错误 Exception：{e}')
 
