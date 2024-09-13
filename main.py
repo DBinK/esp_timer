@@ -15,6 +15,8 @@ class CountdownTimer:
         self.countdown_interval = 5 # * 60
         self.target_time = 0
         self.cntdown_time = 0
+        self.start_time = 0
+        self.cntdown_period_add = 0
         self.cntdown_period_now = 0
 
         self.KEY = Pin(key_pin, Pin.IN, Pin.PULL_UP)
@@ -27,13 +29,17 @@ class CountdownTimer:
         time.sleep_ms(50)  # 消除抖动
         if self.KEY.value() == 0:  # 确认按键被按下
             self.keypass_cnt += 1
-            self.cntdown_period_now = self.countdown_interval * self.keypass_cnt
+            self.cntdown_period_add = self.countdown_interval * self.keypass_cnt
             
             if not self.cntdown_on:
                 self.cntdown_on = True
-                self.target_time = time.time() + self.cntdown_period_now
+                self.start_time  = time.time()
+                self.target_time = self.start_time + self.cntdown_period_add
+                self.cntdown_period_now = self.target_time - time.time()
             else:
-                self.target_time = time.time() + self.cntdown_period_now
+                self.target_time = self.start_time + self.cntdown_period_add
+                self.cntdown_period_now = self.target_time - time.time()
+
 
     def main(self, timer_callback):
         self.oled.fill(0)  # 清屏
