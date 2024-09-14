@@ -19,15 +19,25 @@ class CountdownTimer:
         self.cntdown_period_add = 0
         self.cntdown_period_now = 0
 
+        self.oled_on = True
+
         self.r_key = Pin(1, Pin.IN, Pin.PULL_UP)
         self.r_key.irq(self.r_key_passed, Pin.IRQ_FALLING) 
 
         self.l_key = Pin(0, Pin.IN, Pin.PULL_UP)
         self.l_key.irq(self.l_key_passed, Pin.IRQ_FALLING) 
 
+        self.boot_key = Pin(9, Pin.IN, Pin.PULL_UP)
+        self.boot_key.irq(self.boot_key_passed, Pin.IRQ_FALLING) 
+
         self.timer = Timer(0)  # 定义定时器
         self.timer.init(period=1000, mode=Timer.PERIODIC, callback=self.main)
-    
+    def boot_key_passed(self, key_callback):
+        time.sleep_ms(100)          # 消除抖动
+        if self.boot_key.value() == 0:   # 确认按键被按下
+            self.oled_on = not self.oled_on
+            print(f"oled_on: {self.oled_on}")
+
     def r_key_passed(self, key_callback):
         time.sleep_ms(100)          # 消除抖动
         if self.r_key.value() == 0:   # 确认按键被按下
@@ -50,6 +60,7 @@ class CountdownTimer:
                 self.cntdown_period_now = self.target_time - time.time()
 
     def main(self, timer_callback):
+        
         self.oled.fill(0)
 
         date_time = self.rtc.datetime()
@@ -59,9 +70,10 @@ class CountdownTimer:
 
         print(date_time_str)
 
-        self.oled.text("Date: Time:", 10, 10)
-        self.oled.text(date_time_str, 10, 25)
-        self.oled.block(0, 0, 128, 64) 
+        if self.oled_on:
+            self.oled.text("Date: Time:", 10, 10)
+            self.oled.text(date_time_str, 10, 25)
+            self.oled.block(0, 0, 128, 64) 
 
         if self.cntdown_on:
 
@@ -96,3 +108,9 @@ class CountdownTimer:
 
 # 使用示例
 countdown_timer = CountdownTimer(scl_pin=4, sda_pin=3)
+
+# 在备赛之余，我们也积极将科技融入生活，参与科技节等文化活动，外出展示我们的机甲机器人, 
+
+
+
+# 让我们一起在实践中成长，共同探索科技的无限可能！ 
