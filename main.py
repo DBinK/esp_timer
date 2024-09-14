@@ -3,7 +3,7 @@ from machine import Pin, SoftI2C, RTC, Timer
 from ssd1306 import SSD1306_I2C
 
 class CountdownTimer:
-    def __init__(self, scl_pin, sda_pin, key_pin):
+    def __init__(self, scl_pin, sda_pin):
         self.rtc = RTC()
         self.i2c = SoftI2C(scl=Pin(scl_pin), sda=Pin(sda_pin))
         self.oled = SSD1306_I2C(width=128, height=64, i2c=self.i2c)
@@ -19,14 +19,14 @@ class CountdownTimer:
         self.cntdown_period_add = 0
         self.cntdown_period_now = 0
 
-        self.KEY = Pin(key_pin, Pin.IN, Pin.PULL_UP)
+        self.KEY = Pin(0, Pin.IN, Pin.PULL_UP)
         self.KEY.irq(self.init_timer, Pin.IRQ_FALLING)  # 定义中断，下降沿触发
         
         self.timer = Timer(0)  # 定义定时器
         self.timer.init(period=1000, mode=Timer.PERIODIC, callback=self.main)
 
     def init_timer(self, key_callback):
-        time.sleep_ms(50)  # 消除抖动
+        time.sleep_ms(100)  # 消除抖动
         if self.KEY.value() == 0:  # 确认按键被按下
             self.keypass_cnt += 1
             self.cntdown_period_add = self.countdown_interval * self.keypass_cnt
@@ -84,4 +84,4 @@ class CountdownTimer:
         self.oled.show()
 
 # 使用示例
-countdown_timer = CountdownTimer(scl_pin=4, sda_pin=3, key_pin=9)
+countdown_timer = CountdownTimer(scl_pin=4, sda_pin=3)
