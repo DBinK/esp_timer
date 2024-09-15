@@ -32,6 +32,7 @@ class CountdownTimer:
 
         self.timer = Timer(0)  # 定义定时器
         self.timer.init(period=1000, mode=Timer.PERIODIC, callback=self.main)
+        
     def boot_key_passed(self, key_callback):
         time.sleep_ms(100)          # 消除抖动
         if self.boot_key.value() == 0:   # 确认按键被按下
@@ -71,8 +72,14 @@ class CountdownTimer:
         print(date_time_str)
 
         if self.oled_on:
-            self.oled.text("Date: Time:", 10, 10)
-            self.oled.text(date_time_str, 10, 25)
+
+            # self.oled.text("Date:", 8, 10)
+            self.oled.text(date_str, 1, 2)
+
+            # self.oled.block(56-2, 25-2, 128, 25+10, fill=True) 
+            # self.oled.text("Time:", 56, 10, 0)
+            self.oled.text(time_str, 0, 25, scale=2)
+
             self.oled.block(0, 0, 128, 64) 
 
         if self.cntdown_on:
@@ -81,7 +88,7 @@ class CountdownTimer:
             self.oled.text(f"cnt {self.cntdown_time} s", 10, 45)
 
             rate = self.cntdown_time / self.cntdown_period_now
-            self.oled.block(0, 56, int(128 * (rate)), 64, fill=True)
+            self.oled.block(0, 64-12, int(128 * (rate)), 64, fill=True)
 
             if self.cntdown_time <= 0:
                 self.oled.fill(0)
@@ -91,7 +98,7 @@ class CountdownTimer:
                 time.sleep(0.3)
 
                 self.oled.fill(1)
-                self.oled.text(f"cnt {self.cntdown_time} s", 10, 45, 0)
+                self.oled.text(f"{self.cntdown_time} s", 2, 25, 0, scale=2)  
                 self.oled.show()
                 self.led.value(1)
 

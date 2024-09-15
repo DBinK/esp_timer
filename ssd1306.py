@@ -114,7 +114,7 @@ class SSD1306:
         """
         self.framebuf.scroll(dx, dy)
     
-    def text(self, string, x, y, col=1):
+    def text(self, string, x, y, col=1, scale=1):
         """
         在指定位置绘制文本。
 
@@ -122,8 +122,48 @@ class SSD1306:
         x (int): 文本起始的X坐标。
         y (int): 文本起始的Y坐标。
         col (int, 可选): 文本的颜色，默认为1。
+        scale (float, 可选): 文本的缩放比例，默认为1。
         """
-        self.framebuf.text(string, x, y, col)
+        if scale == 1:
+            self.framebuf.text(string, x, y, col)
+        else:
+            for i, char in enumerate(string):
+                self._draw_char_scaled(char, x + int(i * 8 * scale), y, col, scale)
+
+    def _draw_char_scaled(self, char, x, y, col, scale):
+        """
+        绘制缩放后的字符。
+
+        char (str): 要绘制的字符。
+        x (int): 字符起始的X坐标。
+        y (int): 字符起始的Y坐标。
+        col (int): 字符的颜色。
+        scale (float): 字符的缩放比例。
+        """
+        # 获取字符的位图
+        char_bitmap = framebuf.FrameBuffer(bytearray(8), 8, 8, framebuf.MONO_HLSB)
+        char_bitmap.fill(not col)  # 根据col值设置背景颜色
+        char_bitmap.text(char, 0, 0, col)  # 绘制字符
+
+        # 绘制缩放后的字符
+        for j in range(8):
+            for i in range(8):
+                if char_bitmap.pixel(i, j) == col:
+                    self._draw_scaled_pixel(x + i * scale, y + j * scale, scale, col)
+
+    def _draw_scaled_pixel(self, x, y, scale, col):
+        """
+        绘制缩放后的像素点。
+
+        x (float): 像素的X坐标。
+        y (float): 像素的Y坐标。
+        scale (float): 像素的缩放比例。
+        col (int): 像素的颜色。
+        """
+        for dy in range(int(scale)):
+            for dx in range(int(scale)):
+                self.pixel(int(x + dx), int(y + dy), col)
+
 
     def line(self, x0, y0, x1, y1, col=1):
         """
