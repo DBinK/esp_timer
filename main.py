@@ -1,15 +1,14 @@
 import time
-from machine import Pin, SoftI2C, RTC, Timer
+from machine import Pin, SoftI2C, RTC, Timer # type: ignore
 from ssd1306 import SSD1306_I2C
 
-from boot import WIFI_Connect, Is_Connected
+from wifi import WIFI_Connect # , Is_Connected
 
 def debounce(delay_ns):
     """装饰器: 防止函数在指定时间内被重复调用"""
     def decorator(func):
         last_call_time = 0
         result = None
-
         def wrapper(*args, **kwargs):
             nonlocal last_call_time, result
             current_time = time.time_ns()
@@ -22,21 +21,23 @@ def debounce(delay_ns):
 
 class CountdownTimer:
     def __init__(self, scl_pin, sda_pin):
+        # 初始化各种对象
         self.rtc = RTC()
         self.i2c = SoftI2C(scl=Pin(scl_pin), sda=Pin(sda_pin))
         self.oled = SSD1306_I2C(width=128, height=64, i2c=self.i2c)
         self.led = Pin(8, Pin.OUT)
 
+        # 初始化变量
+        self.oled_on = True
         self.cntdown_on = False
         self.keypass_cnt = 0
-        self.cntdown_interval = 5 * 60
+        self.cntdown_interval = 5 * 60  # 单个定时周期
         self.target_time = 0
         self.cntdown_time = 0
         self.start_time = 0
         self.cntdown_period_now = 0
 
-        self.oled_on = True
-
+        # 按键&定时器初始化
         self.l_key = Pin(5, Pin.IN, Pin.PULL_UP)
         self.l_key.irq(self.l_key_passed, Pin.IRQ_FALLING) 
 
@@ -49,31 +50,31 @@ class CountdownTimer:
         self.timer = Timer(0)  # 定义定时器
         self.timer.init(period=1000, mode=Timer.PERIODIC, callback=self.main)
         
-        #if not Is_Connected():
-        if 1:
-            self.oled.fill(1)
-            self.oled.text("Connecting wifi", 2, 30, 0, scale=1) 
-            self.oled.show()
-            WIFI_Connect()
-            time.sleep(1)
+        # 初始化屏幕
+        self.oled.fill(1)
+        self.oled.text("Wellcome", 0, 30, 0, scale=2) 
+        self.oled.show()
+        WIFI_Connect()
+        time.sleep(1)
         
+    @debounce(150_000_000)  # 设置ns内不重复执行
     def boot_key_passed(self, key_callback):
-        time.sleep_ms(100)          # 消除抖动
-        if self.boot_key.value() == 0:   # 确认按键被按下
+        # time.sleep_ms(100)            # 消除抖动
+        if self.boot_key.value() == 0:  # 确认按键被按下
             self.oled_on = not self.oled_on
             print(f"oled_on: {self.oled_on}")
 
-    @debounce(150_000_000)  # 设置n毫秒内不重复执行
+    @debounce(150_000_000)  # 设置ns内不重复执行
     def l_key_passed(self, key_callback):
         # time.sleep_ms(100)            # 消除抖动
-        if self.l_key.value() == 0:   # 确认按键被按下
+        if self.l_key.value() == 0:     # 确认按键被按下
             self.cntdown_on = False
             self.keypass_cnt = 0
 
-    @debounce(150_000_000)  # 设置n毫秒内不重复执行
+    @debounce(150_000_000)  # 设置ns内不重复执行
     def r_key_passed(self, key_callback):
         # time.sleep_ms(100)            # 消除抖动
-        if self.r_key.value() == 0:   # 确认按键被按下
+        if self.r_key.value() == 0:     # 确认按键被按下
 
             self.keypass_cnt += 1
 
@@ -99,26 +100,16 @@ class CountdownTimer:
 
         date_time = self.rtc.datetime()
 
-        date_str = f"{date_time[1]:02}.{date_time[2]:02}"  # mm:dd:week
-        time_str = f"{date_time[4]:02}:{date_time[5]:02}"  # hh:mm
+        date_str   = f"{date_time[1]:02}.{date_time[2]:02}"  # mm:dd:week
+        time_str   = f"{date_time[4]:02}:{date_time[5]:02}"  # hh:mm
         second_str = f"{date_time[6]:02}" # ss
-        week_str = f"{week_list[date_time[3]]}"
+        week_str   = f"{week_list[date_time[3]]}"
 
         date_time_str = f"{date_str} {time_str}"
 
         print(date_time_str)
 
         if self.oled_on:
-
-            # self.oled.block(0, 0, 44, 14, fill=True)    # 日期背景
-            # self.oled.text(date_str, 1, 3, col=0)         # 显示日期
-
-            # self.oled.block(128-44, 0, 128, 14, fill=True)    # 星期背景
-            # self.oled.text(week_str, 128-44+10, 3, col=0)
-
-            # self.oled.text(time_str, 4, 20, scale=3)      # 显示时间
-            # self.oled.text(second_str, 56, 5, scale=1)      # 显示秒数
-            # self.oled.block(0, 0, 128, 64) 
 
             self.oled.block(0, 0, 44, 14, fill=True)    # 日期背景
             self.oled.text(date_str, 1, 3, col=0)         # 显示日期
@@ -168,9 +159,3 @@ class CountdownTimer:
 
 # 使用示例
 countdown_timer = CountdownTimer(scl_pin=4, sda_pin=10)
-
-# 在备赛之余，我们也积极将科技融入生活，参与科技节等文化活动，外出展示我们的机甲机器人, 
-
-
-
-# 让我们一起在实践中成长，共同探索科技的无限可能！ 
