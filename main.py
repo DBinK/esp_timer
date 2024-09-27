@@ -20,10 +20,11 @@ def debounce(delay_ns):
     return decorator
 
 class CountdownTimer:
-    def __init__(self, scl_pin, sda_pin):
+    def __init__(self):
+
         # 初始化各种对象
         self.rtc = RTC()
-        self.i2c = SoftI2C(scl=Pin(scl_pin), sda=Pin(sda_pin))
+        self.i2c = SoftI2C(scl=Pin(4), sda=Pin(10))
         self.oled = SSD1306_I2C(width=128, height=64, i2c=self.i2c)
         self.led = Pin(8, Pin.OUT)
 
@@ -44,8 +45,8 @@ class CountdownTimer:
         self.r_key = Pin(7, Pin.IN, Pin.PULL_UP)
         self.r_key.irq(self.r_key_passed, Pin.IRQ_FALLING) 
 
-        self.boot_key = Pin(9, Pin.IN, Pin.PULL_UP)
-        self.boot_key.irq(self.boot_key_passed, Pin.IRQ_FALLING) 
+        self.m_key = Pin(6, Pin.IN, Pin.PULL_UP)
+        self.m_key.irq(self.m_key_passed, Pin.IRQ_FALLING) 
 
         self.timer = Timer(0)  # 定义定时器
         self.timer.init(period=1000, mode=Timer.PERIODIC, callback=self.main)
@@ -58,9 +59,9 @@ class CountdownTimer:
         time.sleep(1)
         
     @debounce(150_000_000)  # 设置ns内不重复执行
-    def boot_key_passed(self, key_callback):
+    def m_key_passed(self, key_callback):
         # time.sleep_ms(100)            # 消除抖动
-        if self.boot_key.value() == 0:  # 确认按键被按下
+        if self.m_key.value() == 0:  # 确认按键被按下
             self.oled_on = not self.oled_on
             print(f"oled_on: {self.oled_on}")
 
@@ -158,4 +159,4 @@ class CountdownTimer:
 
 
 # 使用示例
-countdown_timer = CountdownTimer(scl_pin=4, sda_pin=10)
+countdown_timer = CountdownTimer()
