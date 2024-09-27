@@ -62,9 +62,11 @@ def wifi_connect():
         utc_time = time.localtime()
         print("UTC时间:", utc_time)
 
+        s_offset = 1
+
         # 计算并更新北京时间（UTC+8） 到 RTC
-        rtc = RTC()
-        rtc.datetime((utc_time[0], utc_time[1], utc_time[2], utc_time[6], utc_time[3] + 8, utc_time[4], utc_time[5], 0))
+        rtc = RTC() # yyyy         m            d            WK-1         H                M            S
+        rtc.datetime((utc_time[0], utc_time[1], utc_time[2], utc_time[6], utc_time[3] + 8, utc_time[4], utc_time[5]+s_offset, 0))
         
         print("rtc 北京时间:", rtc.datetime())
 
@@ -73,4 +75,4 @@ def Is_Connected():
 
 
 if __name__ == '__main__':
-    WIFI_Connect()
+    wifi_connect()

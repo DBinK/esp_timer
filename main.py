@@ -1,8 +1,10 @@
 import time
-from machine import Pin, SoftI2C, RTC, Timer # type: ignore
+from machine import Pin, SoftI2C, RTC, Timer, freq # type: ignore
 
 import wifi
 from ssd1306 import SSD1306_I2C
+
+freq(80_000_000) # 调整到 80MHz 更省电
 
 def debounce(delay_ns):
     """装饰器: 防止函数在指定时间内被重复调用"""
@@ -71,6 +73,7 @@ class CountdownTimer:
         if self.l_key.value() == 0:     # 确认按键被按下
             self.cntdown_on = False
             self.keypass_cnt = 0
+            self.led.value(1) # 关灯
 
     @debounce(150_000_000)  # 设置ns内不重复执行
     def r_key_passed(self, key_callback):
@@ -126,6 +129,8 @@ class CountdownTimer:
             self.oled.block(0, 0, 128, 64) 
 
         if self.cntdown_on:
+            if self.led.value() == 1:
+                self.led.value(0) # 倒计时期间亮灯
 
             self.cntdown_time = self.target_time - time.time()
             rate = self.cntdown_time / self.cntdown_period_now
