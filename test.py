@@ -1,60 +1,36 @@
-import network, time, ntptime
-from machine import Pin
+import serial
+import time
 
-# 释放所有GPIO, 断电重上电不再失控
-def release_all_GPIO():
-    for i in range(0, 48):
-        try:
-            GND = Pin(i, Pin.OUT, value=0)
-            print(f"releasing gpio {i}")
-        except:
-            print(f"skip gpio {i}")
-            continue
-
-release_all_GPIO()
-
-LED = Pin(8, Pin.OUT)  # 构建led对象
-LED.value(1)  # 点亮LED，也可以使用led.on()
-
-# WIFI连接函数
-def WIFI_Connect():
-    wlan = network.WLAN(network.STA_IF)  # STA模式
-    wlan.active(True)  # 激活接口
-    start_time = time.time()  # 记录时间做超时判断
-
-    if not wlan.isconnected():
-        print('connecting to network...')
-        wlan.connect('ovo', '00000000')  # 输入WIFI账号密码
-
-        while not wlan.isconnected():
-            # LED闪烁提示
-            LED.value(1)
-            time.sleep_ms(300)
-            LED.value(0)
-            time.sleep_ms(300)
-
-            # 超时判断, 15秒没连接成功判定为超时
-            if time.time() - start_time > 8:
-                print('WIFI Connected Timeout!')
-                break
-
-    if wlan.isconnected():
-        # LED点亮
-        LED.value(1)
-
-        # 串口打印信息
-        print('network information:', wlan.ifconfig())
-
-        # 同步时间
-        ntptime.settime()
+def serial_speed_test(port, baudrate=115200, num_iterations=1000):
+    # 打开串口
+    ser = serial.Serial(port, baudrate, timeout=1)
+    
+    # 等待串口准备好
+    time.sleep(2)
+    
+    # 发送和接收数据
+    start_time = time.time()
+    for i in range(num_iterations):
+        # 发送数据
+        ser.write(b'U')
+        ser.flush()
         
-        # 获取当前UTC时间
-        utc_time = time.localtime()
-        print("UTC时间:", utc_time)
+        # 等待接收数据
+        while ser.in_waiting <= 0:
+            pass
+        
+        # 读取返回的数据
+        received = ser.read(1)
+        if received != b'U':
+            print(f"错误: 接收到的数据为 {received}")
+    
+    end_time = time.time()
+    ser.close()
+    
+    # 计算速率
+    elapsed_time = end_time - start_time
+    speed = num_iterations / elapsed_time  # 每秒发送的次数
+    print(f"测试完成: 发送 {num_iterations} 次，耗时 {elapsed_time:.3f} 秒，速率 {speed:.2f} 次/秒")
 
-        # 计算并打印北京时间（UTC+8）
-        beijing_time = time.localtime(time.mktime(utc_time) + 8 * 3600)
-        print("北京时间:", beijing_time)
-
-# 执行WIFI连接函数
-WIFI_Connect()
+# 调用函数进行测试
+serial_speed_test('COM170', 115200)

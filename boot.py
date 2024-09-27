@@ -19,12 +19,13 @@ def release_all_GPIO():
 
 release_all_GPIO()
 
-LED = Pin(8, Pin.OUT)  # 构建led对象
-LED.value(1)  # 点亮LED，也可以使用led.on()
+# LED = Pin(8, Pin.OUT)  # 构建led对象
+# LED.value(1)  # 点亮LED，也可以使用led.on()
+
+wlan = network.WLAN(network.STA_IF)  # STA模式
 
 # WIFI连接函数
 def WIFI_Connect():
-    wlan = network.WLAN(network.STA_IF)  # STA模式
     wlan.active(True)  # 激活接口
     start_time = time.time()  # 记录时间做超时判断
 
@@ -35,27 +36,27 @@ def WIFI_Connect():
         
         try:
             # wlan.connect('ovo', '00000000')  # 输入WIFI账号密码
-            wlan.connect('ovo', '00000000')  # 输入WIFI账号密码
-            # wlan.connect('DT46', '12345678')  # 输入WIFI账号密码
+            # wlan.connect('WX264', '00000000')  # 输入WIFI账号密码
+            wlan.connect('DT46', '12345678')  # 输入WIFI账号密码
         except Exception as e:
             print(f'错误 Exception：{e}')
 
         while not wlan.isconnected():
             # LED闪烁提示
-            LED.value(1)
-            time.sleep_ms(500)
-            LED.value(0)
-            time.sleep_ms(500)
+#             LED.value(1)
+#             time.sleep_ms(500)
+#             LED.value(0)
+#             time.sleep_ms(500)
 
             # 超时判断, 15秒没连接成功判定为超时
             if time.time() - start_time > 5:
-                LED.value(1)
+                #LED.value(1)
                 print('WIFI Connected Timeout!')
                 break
 
     if wlan.isconnected():
         
-        LED.value(0) # LED点亮
+#        LED.value(0) # LED点亮
 
         # 串口打印信息
         print('network information:', wlan.ifconfig())
@@ -76,7 +77,10 @@ def WIFI_Connect():
         rtc = RTC()
         rtc.datetime((utc_time[0], utc_time[1], utc_time[2], utc_time[6], utc_time[3] + 8, utc_time[4], utc_time[5], 0))
         
-        print("北京时间:", rtc.datetime())
+        print("rtc 北京时间:", rtc.datetime())
+
+def Is_Connected():
+    return wlan.isconnected()
 
 # 执行WIFI连接函数
-WIFI_Connect()
+# WIFI_Connect()
