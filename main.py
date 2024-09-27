@@ -1,8 +1,8 @@
 import time
 from machine import Pin, SoftI2C, RTC, Timer # type: ignore
-from ssd1306 import SSD1306_I2C
 
-from wifi import WIFI_Connect # , Is_Connected
+import wifi
+from ssd1306 import SSD1306_I2C
 
 def debounce(delay_ns):
     """装饰器: 防止函数在指定时间内被重复调用"""
@@ -55,7 +55,7 @@ class CountdownTimer:
         self.oled.fill(1)
         self.oled.text("Wellcome", 0, 30, 0, scale=2) 
         self.oled.show()
-        WIFI_Connect()
+        wifi.wifi_connect()
         time.sleep(1)
         
     @debounce(150_000_000)  # 设置ns内不重复执行
@@ -106,9 +106,12 @@ class CountdownTimer:
         second_str = f"{date_time[6]:02}" # ss
         week_str   = f"{week_list[date_time[3]]}"
 
-        date_time_str = f"{date_str} {time_str}"
+        date_time_second_str = f"{date_str} {time_str}:{second_str}"
 
-        print(date_time_str)
+        print(date_time_second_str)
+
+        if date_time[6] == 0: # 整分报时
+            wifi.blink_led()
 
         if self.oled_on:
 

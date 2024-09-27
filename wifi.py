@@ -8,8 +8,15 @@ LED.value(0)           # 点亮LED
 
 wlan = network.WLAN(network.STA_IF)  # STA模式
 
+def blink_led():
+    # LED闪烁提示
+    LED.value(0)
+    time.sleep_ms(100)
+    LED.value(1)
+    time.sleep_ms(100)
+
 # WIFI连接函数
-def WIFI_Connect():
+def wifi_connect():
     wlan.active(True)         # 激活接口
     start_time = time.time()  # 记录时间做超时判断
 
