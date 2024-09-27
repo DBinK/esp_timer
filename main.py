@@ -157,6 +157,5 @@ class CountdownTimer:
 
         self.oled.show()
 
-
-# 使用示例
-countdown_timer = CountdownTimer()
+if __name__ == "__main__":
+    countdown_timer = CountdownTimer()
