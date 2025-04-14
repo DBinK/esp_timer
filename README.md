@@ -10,3 +10,5 @@
 - 左键清空倒计时
 
 - 中键关闭屏幕时间显示
+
+![image](https://github.com/user-attachments/assets/d04a373c-a204-4e47-89b9-dbd4eaa74111)
