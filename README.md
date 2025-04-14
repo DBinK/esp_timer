@@ -11,4 +11,6 @@
 
 - 中键关闭屏幕时间显示
 
+【ESP32-C3 番茄钟定时器 + WiFi 自动校时时钟】https://www.bilibili.com/video/BV1xdoVYwEXR
+
 ![image](https://github.com/user-attachments/assets/d04a373c-a204-4e47-89b9-dbd4eaa74111)
